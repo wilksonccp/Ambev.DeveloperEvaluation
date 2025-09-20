@@ -53,6 +53,21 @@ public class Program
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             var app = builder.Build();
+
+            // Apply pending EF Core migrations at startup (non-fatal)
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();
+                    db.Database.Migrate();
+                }
+                catch (Exception ex)
+                {
+                    // Do not stop the app if DB is not ready yet; logs and continues
+                    Log.Warning(ex, "Database migration failed at startup; continuing to run");
+                }
+            }
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             if (app.Environment.IsDevelopment())
