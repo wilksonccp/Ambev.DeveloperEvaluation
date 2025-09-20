@@ -590,6 +590,15 @@
           "lib/netstandard2.0/Mono.TextTemplating.dll": {}
         }
       },
+      "NodaMoney/2.3.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/NodaMoney.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/NodaMoney.dll": {}
+        }
+      },
       "Npgsql/8.0.4": {
         "type": "package",
         "compile": {
@@ -1102,7 +1111,8 @@
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "Ambev.DeveloperEvaluation.Common": "1.0.0",
-          "FluentValidation": "11.10.0"
+          "FluentValidation": "11.10.0",
+          "NodaMoney": "2.3.0"
         },
         "compile": {
           "bin/placeholder/Ambev.DeveloperEvaluation.Domain.dll": {}
@@ -2319,6 +2329,23 @@
         "lib/netstandard2.0/Mono.TextTemplating.dll",
         "mono.texttemplating.2.2.1.nupkg.sha512",
         "mono.texttemplating.nuspec"
+      ]
+    },
+    "NodaMoney/2.3.0": {
+      "sha512": "8pMXm3loWKpPkn2PaWFtyhYTcs544/oXtEjZza2u4m7W8j/p8TC9ROwlEsSRRX88MY2D43cCwp6MKv0+6XBZfA==",
+      "type": "package",
+      "path": "nodamoney/2.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net8.0/NodaMoney.dll",
+        "lib/net9.0/NodaMoney.dll",
+        "lib/netstandard2.0/NodaMoney.dll",
+        "lib/netstandard2.1/NodaMoney.dll",
+        "logo_nodamoney.png",
+        "nodamoney.2.3.0.nupkg.sha512",
+        "nodamoney.nuspec"
       ]
     },
     "Npgsql/8.0.4": {

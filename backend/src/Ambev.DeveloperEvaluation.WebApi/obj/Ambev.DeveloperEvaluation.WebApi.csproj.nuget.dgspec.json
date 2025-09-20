@@ -988,6 +988,10 @@
             "FluentValidation": {
               "target": "Package",
               "version": "[11.10.0, )"
+            },
+            "NodaMoney": {
+              "target": "Package",
+              "version": "[2.3.0, )"
             }
           },
           "imports": [
