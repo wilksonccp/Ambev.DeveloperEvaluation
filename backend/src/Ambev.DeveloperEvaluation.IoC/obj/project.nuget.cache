@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "K1MhLnJd7+w=",
+  "dgSpecHash": "2f9jO+kJNXk=",
   "success": true,
   "projectFilePath": "C:\\Users\\wilks\\OneDrive\\Documentos\\APRENDENDO A PROGRAMAR\\PROJETOS\\desafioMouts\\template\\backend\\src\\Ambev.DeveloperEvaluation.IoC\\Ambev.DeveloperEvaluation.IoC.csproj",
   "expectedPackageFiles": [
@@ -21,6 +21,7 @@
     "C:\\Users\\wilks\\.nuget\\packages\\microsoft.identitymodel.protocols\\7.1.2\\microsoft.identitymodel.protocols.7.1.2.nupkg.sha512",
     "C:\\Users\\wilks\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\7.1.2\\microsoft.identitymodel.protocols.openidconnect.7.1.2.nupkg.sha512",
     "C:\\Users\\wilks\\.nuget\\packages\\microsoft.identitymodel.tokens\\7.1.2\\microsoft.identitymodel.tokens.7.1.2.nupkg.sha512",
+    "C:\\Users\\wilks\\.nuget\\packages\\nodamoney\\2.3.0\\nodamoney.2.3.0.nupkg.sha512",
     "C:\\Users\\wilks\\.nuget\\packages\\npgsql\\8.0.4\\npgsql.8.0.4.nupkg.sha512",
     "C:\\Users\\wilks\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\8.0.8\\npgsql.entityframeworkcore.postgresql.8.0.8.nupkg.sha512",
     "C:\\Users\\wilks\\.nuget\\packages\\oneof\\3.0.271\\oneof.3.0.271.nupkg.sha512",

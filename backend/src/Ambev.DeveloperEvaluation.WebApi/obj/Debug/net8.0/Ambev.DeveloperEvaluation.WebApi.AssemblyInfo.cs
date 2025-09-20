@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ambev.DeveloperEvaluation.WebApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+afb2c31ba886ec1850b51dc4d9abaef7e09859e4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f3516f0f82d3ea16ec0d4bdfef18ecc957acbd25")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ambev.DeveloperEvaluation.WebApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ambev.DeveloperEvaluation.WebApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
