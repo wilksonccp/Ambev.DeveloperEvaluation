@@ -1,0 +1,1 @@
+C:\Users\wilks\OneDrive\Documentos\APRENDENDO A PROGRAMAR\PROJETOS\desafioMouts\template\backend\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
