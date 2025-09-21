@@ -47,6 +47,8 @@ public class SaleItem
             throw new DomainException("ITEM_CANCELLED", "Cannot change quantity of a cancelled item.");
         if (newQuantity < 1)
             throw new DomainException("QUANTITY_MUST_BE_POSITIVE", "Quantity must be at least 1.");
+        if (newQuantity > DiscountPolicy.MaxPerItem)
+            throw new DomainException("MAX_PER_ITEM_EXCEEDED", $"Quantity per product cannot exceed {DiscountPolicy.MaxPerItem}.");
 
         // DiscountPolicy will handle max per item validation
         Quantity = newQuantity;
@@ -61,6 +63,17 @@ public class SaleItem
 
         // DiscountPolicy will handle max per item validation
         Quantity += increment;
+    }
+    internal void DecreaseQuantity(int decrement)
+    {
+        if (IsCancelled)
+            throw new DomainException("ITEM_CANCELLED", "Cannot change quantity of a cancelled item.");
+        if (decrement < 1)
+            throw new DomainException("DECREMENT_MUST_BE_POSITIVE", "Decrement must be at least 1.");
+        if (Quantity - decrement < 1)
+            throw new DomainException("QUANTITY_MUST_BE_POSITIVE", "Quantity must be at least 1.");
+
+        Quantity -= decrement;
     }
     internal void EnsureSameUnitPrice(decimal unitPrice)
     {

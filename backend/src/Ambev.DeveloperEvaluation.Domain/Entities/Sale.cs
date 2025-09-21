@@ -127,18 +127,22 @@ public class Sale
         Recalculate();
     }
 
-    public void RemoveItem(Guid productId)
+    public void RemoveItem(Guid productId, int quantity)
     {
         EnsureNotCancelled();
 
         var existingItem = Items.FirstOrDefault(i => i.ProductId == productId && !i.IsCancelled);
         if (existingItem is null)
             throw new DomainException("ITEM_NOT_FOUND", "Cannot remove a non-existing item.");
+        if (existingItem.Quantity - quantity < 1)
+            throw new DomainException("QUANTITY_MUST_BE_POSITIVE", "Quantity must be at least 1 after removal.");
 
-        existingItem.Cancel();
+        existingItem.DecreaseQuantity(quantity);
+        if (existingItem.Quantity == 0)
+            existingItem.Cancel();
+
         Recalculate();
     }
-
     public void CancelItems()
     {
         EnsureNotCancelled();
@@ -150,6 +154,7 @@ public class Sale
         foreach (var i in activeItems)
             i.Cancel();
         Recalculate();
+
     }
 
     public void CancelSale()
@@ -160,7 +165,7 @@ public class Sale
             throw new DomainException("ACTIVE_ITEMS_EXIST", "Cannot cancel sale with active items. Cancel or remove all items first.");
 
         IsCancelled = true;
-        UpdatedAt = DateTime.UtcNow;
+        Recalculate();
     }
 
     public void Recalculate()
