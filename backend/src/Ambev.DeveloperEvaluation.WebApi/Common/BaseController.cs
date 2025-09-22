@@ -5,6 +5,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Common;
 
 [Route("api/[controller]")]
 [ApiController]
+[Microsoft.AspNetCore.Authorization.Authorize]
 public class BaseController : ControllerBase
 {
     protected int GetCurrentUserId() =>
