@@ -7,6 +7,11 @@ using Ambev.DeveloperEvaluation.IoC;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
+using Microsoft.OpenApi.Models;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Common.Security;
+using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -27,7 +32,34 @@ public class Program
             builder.Services.AddEndpointsApiExplorer();
 
             builder.AddBasicHealthChecks();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Ambev Developer Evaluation API", Version = "v1" });
+
+                var securityScheme = new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Description = "Enter 'Bearer {token}'",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                };
+
+                options.AddSecurityDefinition("Bearer", securityScheme);
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        securityScheme,
+                        Array.Empty<string>()
+                    }
+                });
+            });
 
             builder.Services.AddDbContext<DefaultContext>(options =>
                 options.UseNpgsql(
@@ -61,6 +93,25 @@ public class Program
                 {
                     var db = scope.ServiceProvider.GetRequiredService<DefaultContext>();
                     db.Database.Migrate();
+
+                    // Seed a default admin user if none exists
+                    var users = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+                    var existing = users.GetByEmailAsync("admin@local", CancellationToken.None).GetAwaiter().GetResult();
+                    if (existing is null)
+                    {
+                        var admin = new User
+                        {
+                            Username = "Admin",
+                            Email = "admin@local",
+                            Phone = "(00) 00000-0000",
+                            Password = hasher.HashPassword("Admin@123"),
+                            Role = UserRole.Admin,
+                            Status = UserStatus.Active,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        users.CreateAsync(admin, CancellationToken.None).GetAwaiter().GetResult();
+                    }
                 }
                 catch (Exception ex)
                 {
