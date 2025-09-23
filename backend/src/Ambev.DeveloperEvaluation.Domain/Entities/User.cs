@@ -11,8 +11,8 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities;
 /// Represents a user in the system with authentication and profile information.
 /// This entity follows domain-driven design principles and includes business rules validation.
 /// </summary>
-public class User : BaseEntity, IUser
-{
+    public class User : BaseEntity, IUser
+    {
     /// <summary>
     /// Gets the user's full name.
     /// Must not be null or empty and should contain both first and last names.
@@ -51,6 +51,12 @@ public class User : BaseEntity, IUser
     public UserStatus Status { get; set; }
 
     /// <summary>
+    /// Gets or sets the Branch identifier for branch-scoped users (e.g., Manager).
+    /// Null for users without branch scope (e.g., Customer, Admin if not scoped).
+    /// </summary>
+    public Guid? BranchId { get; set; }
+
+    /// <summary>
     /// Gets the date and time when the user was created.
     /// </summary>
     public DateTime CreatedAt { get; set; }
@@ -77,6 +83,11 @@ public class User : BaseEntity, IUser
     /// </summary>
     /// <returns>The user's role as a string.</returns>
     string IUser.Role => Role.ToString();
+
+    /// <summary>
+    /// BranchId string for JWT claims (when applicable).
+    /// </summary>
+    string? IUser.BranchId => BranchId?.ToString();
 
     /// <summary>
     /// Initializes a new instance of the User class.

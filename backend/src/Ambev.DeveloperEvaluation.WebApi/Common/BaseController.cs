@@ -8,8 +8,18 @@ namespace Ambev.DeveloperEvaluation.WebApi.Common;
 [Microsoft.AspNetCore.Authorization.Authorize]
 public class BaseController : ControllerBase
 {
-    protected int GetCurrentUserId() =>
-            int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new NullReferenceException());
+    protected Guid GetCurrentUserId() =>
+            Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new NullReferenceException());
+
+    protected string GetCurrentUserRole() =>
+        User.FindFirst(ClaimTypes.Role)?.Value ?? throw new NullReferenceException();
+
+    protected Guid? GetCurrentUserBranchId()
+    {
+        var claim = User.FindFirst("branchId")?.Value;
+        if (Guid.TryParse(claim, out var id)) return id;
+        return null;
+    }
 
     protected string GetCurrentUserEmail() =>
         User.FindFirst(ClaimTypes.Email)?.Value ?? throw new NullReferenceException();

@@ -4,6 +4,10 @@ using AutoMapper;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Auth.AuthenticateUserFeature;
 using Ambev.DeveloperEvaluation.Application.Auth.AuthenticateUser;
+using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
+using Ambev.DeveloperEvaluation.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Ambev.DeveloperEvaluation.WebApi.Features.Users.CreateUser;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Auth;
 
@@ -12,10 +16,10 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Auth;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : BaseController
-{
-    private readonly IMediator _mediator;
-    private readonly IMapper _mapper;
+    public class AuthController : BaseController
+    {
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of AuthController
@@ -55,6 +59,32 @@ public class AuthController : BaseController
             Success = true,
             Message = "User authenticated successfully",
             Data = _mapper.Map<AuthenticateUserResponse>(response)
+        });
+    }
+
+    [HttpPost("signup")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ApiResponseWithData<CreateUserResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SignUp([FromBody] SignUpFeature.SignUpRequest request, CancellationToken cancellationToken)
+    {
+        // Force role to Customer and status to Active regardless of input
+        var command = new CreateUserCommand
+        {
+            Username = request.Username,
+            Password = request.Password,
+            Phone = request.Phone,
+            Email = request.Email,
+            Status = UserStatus.Active,
+            Role = UserRole.Customer
+        };
+
+        var result = await _mediator.Send(command, cancellationToken);
+        return Created(string.Empty, new ApiResponseWithData<CreateUserResponse>
+        {
+            Success = true,
+            Message = "Customer registered successfully",
+            Data = _mapper.Map<CreateUserResponse>(result)
         });
     }
 }

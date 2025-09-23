@@ -1,5 +1,7 @@
 using MediatR;
+using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using Ambev.DeveloperEvaluation.WebApi.Common;
 using Ambev.DeveloperEvaluation.WebApi.Features.Sales.CreateSale;
@@ -19,6 +21,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Customer,Manager,Admin")]
 public class SalesController : BaseController
 {
     private readonly IMediator _mediator;
@@ -41,6 +44,19 @@ public class SalesController : BaseController
             return BadRequest(validationResult.Errors);
 
         var command = _mapper.Map<CreateSaleCommand>(request);
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+        {
+            var currentUserId = GetCurrentUserId();
+            command = command with { CustomerId = currentUserId };
+        }
+        else if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null)
+                return Forbid();
+            command = command with { BranchId = branchId.Value };
+        }
         var result = await _mediator.Send(command, cancellationToken);
 
         return Created(string.Empty, new ApiResponseWithData<CreateSaleResponse>
@@ -60,6 +76,20 @@ public class SalesController : BaseController
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors);
 
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            if (sale.CustomerId != GetCurrentUserId())
+                return Forbid();
+        }
+        else if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null || sale.BranchId != branchId.Value)
+                return Forbid();
+        }
         var command = new AddItemToSaleCommand(id, request.ProductId, request.ProductName, request.UnitPrice, request.Quantity);
         var result = await _mediator.Send(command, cancellationToken);
         return Ok(new ApiResponseWithData<CreateSaleResponse>
@@ -79,6 +109,20 @@ public class SalesController : BaseController
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors);
 
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            if (sale.CustomerId != GetCurrentUserId())
+                return Forbid();
+        }
+        else if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null || sale.BranchId != branchId.Value)
+                return Forbid();
+        }
         var command = new UpdateItemQuantityCommand(id, productId, request.Quantity);
         var result = await _mediator.Send(command, cancellationToken);
         return Ok(new ApiResponseWithData<CreateSaleResponse>
@@ -98,6 +142,20 @@ public class SalesController : BaseController
         if (!validationResult.IsValid)
             return BadRequest(validationResult.Errors);
 
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            if (sale.CustomerId != GetCurrentUserId())
+                return Forbid();
+        }
+        else if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null || sale.BranchId != branchId.Value)
+                return Forbid();
+        }
         var command = new RemoveItemFromSaleCommand(id, productId, request.Quantity);
         var result = await _mediator.Send(command, cancellationToken);
         return Ok(new ApiResponseWithData<CreateSaleResponse>
@@ -112,6 +170,20 @@ public class SalesController : BaseController
     [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelItems([FromRoute] Guid id, CancellationToken cancellationToken)
     {
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            if (sale.CustomerId != GetCurrentUserId())
+                return Forbid();
+        }
+        else if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null || sale.BranchId != branchId.Value)
+                return Forbid();
+        }
         var result = await _mediator.Send(new CancelItemsCommand(id), cancellationToken);
         return Ok(new ApiResponseWithData<CreateSaleResponse>
         {
@@ -125,6 +197,20 @@ public class SalesController : BaseController
     [ProducesResponseType(typeof(ApiResponseWithData<CreateSaleResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> CancelSale([FromRoute] Guid id, CancellationToken cancellationToken)
     {
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            if (sale.CustomerId != GetCurrentUserId())
+                return Forbid();
+        }
+        else if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null || sale.BranchId != branchId.Value)
+                return Forbid();
+        }
         var result = await _mediator.Send(new CancelSaleCommand(id), cancellationToken);
         return Ok(new ApiResponseWithData<CreateSaleResponse>
         {
@@ -139,6 +225,15 @@ public class SalesController : BaseController
     public async Task<IActionResult> GetSale([FromRoute] Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase) && result.CustomerId != GetCurrentUserId())
+            return Forbid();
+        if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null || result.BranchId != branchId.Value)
+                return Forbid();
+        }
         return Ok(new ApiResponseWithData<CreateSaleResponse>
         {
             Success = true,
@@ -158,6 +253,22 @@ public class SalesController : BaseController
         [FromQuery] string? number = null,
         CancellationToken cancellationToken = default)
     {
+        // Enforce scoping by role
+        var role = GetCurrentUserRole();
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+        {
+            customerId = GetCurrentUserId();
+            branchId = null; // ignore client-provided branch filter for customers
+        }
+        else if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var currentBranch = GetCurrentUserBranchId();
+            if (currentBranch is null)
+                return Forbid();
+            branchId = currentBranch;
+            // ignore client-provided customerId for managers
+            customerId = null;
+        }
         var query = new ListSalesQuery(page, size, order, customerId, branchId, number);
         var result = await _mediator.Send(query, cancellationToken);
 

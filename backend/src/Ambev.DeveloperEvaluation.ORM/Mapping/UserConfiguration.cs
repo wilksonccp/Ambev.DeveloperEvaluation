@@ -27,5 +27,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<string>()
             .HasMaxLength(20);
 
+        // Optional BranchId for branch-scoped users (e.g., Manager)
+        builder.Property(u => u.BranchId)
+            .HasColumnType("uuid")
+            .IsRequired(false);
+
     }
 }

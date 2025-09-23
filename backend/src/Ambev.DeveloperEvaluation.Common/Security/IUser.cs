@@ -22,5 +22,10 @@
         /// </summary>
         /// <returns>O papel do usuário como uma string.</returns>
         public string Role { get; }
+
+        /// <summary>
+        /// Obtém o identificador da filial do usuário (quando aplicável).
+        /// </summary>
+        public string? BranchId { get; }
     }
 }
