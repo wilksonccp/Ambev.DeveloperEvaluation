@@ -189,6 +189,14 @@ public class Sale
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void SoftDelete()
+    {
+        if (DeletedAt is not null)
+            throw new DomainException("SALE_ALREADY_DELETED", "Sale has already been deleted.");
+        DeletedAt = DateTime.UtcNow;
+        UpdatedAt = DeletedAt.Value;
+    }
+
     private SaleItem FindItemOrThrow(Guid productId)
     {
         var item = Items.FirstOrDefault(i => i.ProductId == productId && !i.IsCancelled);

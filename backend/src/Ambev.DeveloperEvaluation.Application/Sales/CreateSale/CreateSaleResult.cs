@@ -4,6 +4,7 @@ public class CreateSaleResult
 {
     public Guid Id { get; set; }
     public string Number { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public Guid BranchId { get; set; }
@@ -12,6 +13,7 @@ public class CreateSaleResult
     public decimal TotalAmount { get; set; }
     public decimal TotalDiscount { get; set; }
     public decimal TotalPayable { get; set; }
+    public bool IsCancelled { get; set; }
 
     public List<CreateSaleItemResult> Items { get; set; } = new();
 }

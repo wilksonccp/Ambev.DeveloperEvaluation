@@ -16,6 +16,7 @@ using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Application.Sales.CancelItems;
 using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
 using Ambev.DeveloperEvaluation.Application.Sales.ListSales;
+using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales;
 
@@ -278,6 +279,30 @@ public class SalesController : BaseController
             Success = true,
             Message = "Sales listed successfully",
             Data = response
+        });
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteSale([FromRoute] Guid id, CancellationToken cancellationToken)
+    {
+        // Scope checks similar to other mutations
+        var role = GetCurrentUserRole();
+        var sale = await _mediator.Send(new GetSaleQuery(id), cancellationToken);
+        if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase) && sale.CustomerId != GetCurrentUserId())
+            return Forbid();
+        if (string.Equals(role, "Manager", StringComparison.OrdinalIgnoreCase))
+        {
+            var branchId = GetCurrentUserBranchId();
+            if (branchId is null || sale.BranchId != branchId.Value)
+                return Forbid();
+        }
+
+        await _mediator.Send(new DeleteSaleCommand(id), cancellationToken);
+        return Ok(new ApiResponse
+        {
+            Success = true,
+            Message = "Sale deleted successfully"
         });
     }
 }

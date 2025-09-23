@@ -16,13 +16,13 @@ public class SaleRepository : ISaleRepository
     public async Task<Sale?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Sales
-            .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(s => s.Id == id && s.DeletedAt == null, cancellationToken);
     }
 
     public async Task<Sale?> GetByNumberAsync(string number, CancellationToken cancellationToken = default)
     {
         return await _context.Sales
-            .FirstOrDefaultAsync(s => s.Number == number, cancellationToken);
+            .FirstOrDefaultAsync(s => s.Number == number && s.DeletedAt == null, cancellationToken);
     }
 
     public async Task AddAsync(Sale sale, CancellationToken cancellationToken = default)
@@ -46,7 +46,8 @@ public class SaleRepository : ISaleRepository
         string? number = null,
         CancellationToken cancellationToken = default)
     {
-        IQueryable<Sale> query = _context.Sales.AsNoTracking();
+        IQueryable<Sale> query = _context.Sales.AsNoTracking()
+            .Where(s => s.DeletedAt == null);
 
         if (customerId.HasValue)
             query = query.Where(s => s.CustomerId == customerId.Value);

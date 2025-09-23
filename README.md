@@ -152,3 +152,37 @@ root
 - PostgreSQL must have **pgcrypto** extension enabled for `gen_random_uuid()`.  
 - Commits are atomic and follow **Git Flow** + **Semantic Commit Messages**.  
 - Documentation maintained in **English**.  
+
+---
+
+## Migrations (EF Core)
+
+Run from repository root or `backend` folder:
+
+- Install EF tools (once):
+  - `dotnet tool install --global dotnet-ef`
+- Add migration for recent changes (e.g., User.BranchId):
+  - `dotnet ef migrations add AddUserBranchId -p src/Ambev.DeveloperEvaluation.ORM -s src/Ambev.DeveloperEvaluation.WebApi`
+- Apply migrations:
+  - `dotnet ef database update -p src/Ambev.DeveloperEvaluation.ORM -s src/Ambev.DeveloperEvaluation.WebApi`
+
+## Access Control Summary
+
+- `POST /api/Auth` (login): open
+- `POST /api/Auth/signup`: open, creates Customer (Active)
+- Users
+  - `POST /api/Users`: Admin only
+  - `GET /api/Users/{id}`: Admin only
+  - `DELETE /api/Users/{id}`: Admin only
+- Sales (requires JWT; roles Customer, Manager, Admin)
+  - Customer: sees/edits only own sales; `customerId` forced from token
+  - Manager: scoped to own `branchId` (from token)
+  - Admin: full access
+
+Sales responses include `createdAt` and `isCancelled`.
+
+## Soft Delete Behavior (Sales)
+
+- `DELETE /api/Sales/{id}` performs a soft delete (sets `deletedAt`).
+- `GET /api/Sales/{id}` returns 404 for soft-deleted sales.
+- `GET /api/Sales` excludes soft-deleted sales from results.
