@@ -3,6 +3,8 @@ using MediatR;
 using FluentValidation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Common;
+using Ambev.DeveloperEvaluation.Domain.Events;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.AddItem;
 
@@ -10,11 +12,13 @@ public class AddItemToSaleHandler : IRequestHandler<AddItemToSaleCommand, Create
 {
     private readonly ISaleRepository _saleRepository;
     private readonly IMapper _mapper;
+    private readonly IDomainEventPublisher _eventPublisher;
 
-    public AddItemToSaleHandler(ISaleRepository saleRepository, IMapper mapper)
+    public AddItemToSaleHandler(ISaleRepository saleRepository, IMapper mapper, IDomainEventPublisher eventPublisher)
     {
         _saleRepository = saleRepository;
         _mapper = mapper;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<CreateSale.CreateSaleResult> Handle(AddItemToSaleCommand request, CancellationToken cancellationToken)
@@ -31,6 +35,15 @@ public class AddItemToSaleHandler : IRequestHandler<AddItemToSaleCommand, Create
         sale.AddItem(request.ProductId, request.ProductName, request.UnitPrice, request.Quantity);
 
         await _saleRepository.UpdateAsync(sale, cancellationToken);
+
+        await _eventPublisher.PublishAsync(new SaleModifiedDomainEvent(
+            sale.Id,
+            "ItemAdded",
+            sale.TotalAmount,
+            sale.TotalDiscount,
+            sale.TotalPayable,
+            request.ProductId,
+            request.Quantity), cancellationToken);
 
         return _mapper.Map<CreateSale.CreateSaleResult>(sale);
     }

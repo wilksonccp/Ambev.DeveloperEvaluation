@@ -2,6 +2,8 @@ using MediatR;
 using AutoMapper;
 using FluentValidation;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Domain.Common;
+using Ambev.DeveloperEvaluation.Domain.Events;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.RemoveItem;
 
@@ -9,11 +11,13 @@ public class RemoveItemFromSaleHandler : IRequestHandler<RemoveItemFromSaleComma
 {
     private readonly ISaleRepository _saleRepository;
     private readonly IMapper _mapper;
+    private readonly IDomainEventPublisher _eventPublisher;
 
-    public RemoveItemFromSaleHandler(ISaleRepository saleRepository, IMapper mapper)
+    public RemoveItemFromSaleHandler(ISaleRepository saleRepository, IMapper mapper, IDomainEventPublisher eventPublisher)
     {
         _saleRepository = saleRepository;
         _mapper = mapper;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<CreateSale.CreateSaleResult> Handle(RemoveItemFromSaleCommand request, CancellationToken cancellationToken)
@@ -31,6 +35,15 @@ public class RemoveItemFromSaleHandler : IRequestHandler<RemoveItemFromSaleComma
 
         await _saleRepository.UpdateAsync(sale, cancellationToken);
 
+        await _eventPublisher.PublishAsync(new SaleModifiedDomainEvent(
+            sale.Id,
+            "ItemRemoved",
+            sale.TotalAmount,
+            sale.TotalDiscount,
+            sale.TotalPayable,
+            request.ProductId,
+            request.Quantity), cancellationToken);
+        
         return _mapper.Map<CreateSale.CreateSaleResult>(sale);
     }
 }
