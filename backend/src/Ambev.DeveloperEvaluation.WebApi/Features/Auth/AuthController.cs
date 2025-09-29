@@ -41,8 +41,8 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Auth;
     [HttpPost]
     [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponseWithData<AuthenticateUserResponse>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> AuthenticateUser([FromBody] AuthenticateUserRequest request, CancellationToken cancellationToken)
     {
         var validator = new AuthenticateUserRequestValidator();
@@ -65,7 +65,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Auth;
     [HttpPost("signup")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponseWithData<CreateUserResponse>), StatusCodes.Status201Created)]
-    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SignUp([FromBody] SignUpFeature.SignUpRequest request, CancellationToken cancellationToken)
     {
         // Force role to Customer and status to Active regardless of input
@@ -88,3 +88,4 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Auth;
         });
     }
 }
+

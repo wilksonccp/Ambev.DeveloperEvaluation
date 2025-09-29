@@ -9,7 +9,6 @@ using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.OpenApi.Models;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +28,7 @@ public class Program
             builder.AddDefaultLogging();
 
             builder.Services.AddControllers();
+            builder.Services.AddProblemDetails();
             builder.Services.AddEndpointsApiExplorer();
 
             builder.AddBasicHealthChecks();
@@ -119,7 +119,7 @@ public class Program
                     Log.Warning(ex, "Database migration failed at startup; continuing to run");
                 }
             }
-            app.UseMiddleware<ValidationExceptionMiddleware>();
+            app.UseMiddleware<ProblemDetailsMiddleware>();
 
             if (app.Environment.IsDevelopment())
             {
@@ -148,3 +148,10 @@ public class Program
         }
     }
 }
+
+
+
+
+
+
+
